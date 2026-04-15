@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sweet Cravings - Products</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #f5e1da;
+    }
+
+    .card {
+      background-color: #ffffff;
+      color: #000;
+    }
+
+    .product-card img {
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .navbar {
+      background-color: #3d342a !important;
+      /* Dark brown navbar */
+    }
+
+    .navbar-nav .nav-link {
+      color: #F5F0E1 !important;
+      /* Light text color */
+    }
+
+    .navbar-nav .nav-link:hover {
+      background-color: #3C2F20;
+      border-radius: 5px;
+      color: #ffffff !important;
+    }
+
+    .navbar-brand {
+
+      font-family: 'Satisfy', cursive;
+      font-size: 1.9rem;
+      color: white;
+    }
+
+    .navbar-brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+    }
+
+    .navbar-nav .dropdown-menu {
+      background-color: #3C2F20;
+      border-radius: 8px;
+      border: 1px solid #6A4E23;
+    }
+
+    .navbar-nav .dropdown-item {
+      color: #F5F0E1;
+      padding: 12px 16px;
+    }
+
+    .navbar-nav .dropdown-item:hover {
+      background-color: #6A4E23;
+      color: white;
+      border-radius: 5px;
+    }
+
+    .navbar-nav .form-control {
+      background-color: #F5F0E1;
+      border-radius: 5px;
+    }
+
+    .navbar-nav .form-control:focus {
+      border-color: #6A4E23;
+    }
+
+    /* Ratings */
+    .stars {
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .star {
+      color: gray;
+      margin-right: 2px;
+    }
+
+    .star:hover {
+      color: gold;
+    }
+
+    .star.selected {
+      color: gold;
+    }
+
+
+    .rating-wrapper {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 3px 6px;
+      border-radius: 5px;
+    }
+
+    .product-card {
+      position: relative;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">
+        <img src="images/logo.jpg" alt="Bakery Logo" width="30" height="30" class="me-2">
+        Sweet Cravings</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.php">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="#">Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="cart.php">Cart</a></li>
+          <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              Categories
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#" onclick="filterProducts('bread')">Bread</a></li>
+              <li><a class="dropdown-item" href="#" onclick="filterProducts('cake')">Cake</a></li>
+              <li><a class="dropdown-item" href="#" onclick="filterProducts('pastry')">Pastry</a></li>
+              <li><a class="dropdown-item" href="#" onclick="filterProducts('cookies')">Cookies</a></li>
+            </ul>
+          </li>
+        </ul>
+        <form class="d-flex ms-3">
+          <input class="form-control me-2" type="search" id="searchInput" placeholder="Search" aria-label="Search">
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Product Grid -->
+  <section class="container mt-4">
+    <h2 class="mb-4 text-center">Sweet Cravings Special</h2>
+    <div class="row" id="productGrid">
+      <!-- JS will insert products here -->
+    </div>
+  </section>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const productGrid = document.getElementById('productGrid');
+    const searchInput = document.getElementById('searchInput');
+
+    let allProducts = [];
+
+    function filterProducts(category) {
+      if (category === 'all') {
+        displayProducts(allProducts);
+      } else {
+        const filtered = allProducts.filter(
+          p => p.category && p.category.toLowerCase() === category.toLowerCase()
+        );
+        displayProducts(filtered);
+      }
+    }
+
+
+    // Fetch products from product.php
+    async function fetchProducts(query = '') {
+      try {
+        const response = await fetch(`product.php${query ? '?search=' + encodeURIComponent(query) : ''}`);
+        const data = await response.json();
+        allProducts = data;
+        displayProducts(allProducts);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    }
+
+    // Display products
+    function displayProducts(products) {
+      productGrid.innerHTML = "";
+      products.forEach((product, index) => {
+        const col = document.createElement('div');
+        col.className = "col-md-4 mb-4";
+
+
+        col.innerHTML = `
+  <div class="card product-card shadow-sm">
+    <img src="${product.image_url.trim()}" class="card-img-top" alt="${product.name}">
+    <div class="card-body">
+      <h5 class="card-title">${product.name}</h5>
+      <p class="card-text">₹${parseFloat(product.price).toFixed(2)}</p>
+      <button class="btn btn-sm btn-outline-danger" onclick="addToCart('${product.name}', ${product.price}, '${product.image_url.trim()}')">Add to Cart</button>
+    </div>
+    <div class="rating-wrapper">
+      <div class="stars" data-product-id="${product.id}">
+        ${[...Array(5)].map((_, i) => `<span class="star" onclick="rateProduct(${product.id}, ${i + 1})">☆</span>`).join('')}
+      </div>
+    </div>
+  </div>`;
+        productGrid.appendChild(col);
+      });
+    }
+
+    // Cart
+    function addToCart(productName, productPrice, productImage) {
+      fetch('add_to_cart.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `name=${encodeURIComponent(productName)}&price=${productPrice}&image=${encodeURIComponent(productImage)}`
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(`${productName} has been added to your cart!`);
+          } else {
+            alert(data.message || 'Failed to add to cart.');
+            if (data.message && data.message.toLowerCase().includes('log in')) {
+              // Redirect to login page
+              window.location.href = 'login.html';
+            }
+          }
+        })
+        .catch(error => {
+          alert('Error adding to cart.');
+          console.error(error);
+        });
+    }
+
+
+    // Search
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim().toLowerCase();
+      fetchProducts(query);
+    });
+
+    // Ratings
+    function rateProduct(productId, rating) {
+      fetch('submit_rating.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `product_id=${productId}&rating=${rating}`
+      })
+        .then(response => response.text())
+        .then(data => {
+          console.log(data);
+          // Optionally update average rating display here
+        })
+        .catch(err => console.error('Error:', err));
+    }
+
+
+    // Initial fetch
+    fetchProducts();
+  </script>
+
+</body>
+
+</html>
