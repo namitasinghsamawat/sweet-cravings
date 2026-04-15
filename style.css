@@ -3,7 +3,7 @@
   background-color: #6A4E23;
   /* Dark brown navbar */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  /* Soft shadow effect */
+
   position: sticky;
   top: 0;
   z-index: 9999;
